@@ -31,3 +31,6 @@ Thumbs.db
 
 Topics/Finetuning/
 Topics/InstructionTuning/
+
+data/
+chroma_db/
