@@ -15,7 +15,7 @@ Upload any PDF → Ask questions → Get accurate, grounded answers
 **What it does:**
 - Automatically processes and chunks your PDF documents
 - Embeds content into a searchable vector database
-- Retrieves diverse, relevant information using MMR algorithm
+- Retrieves diverse, relevant information using MMR algorithm or Multi-Query method
 - Generates answers grounded solely in document context
 - Prevents hallucinations with anti-hallucination prompting
 
@@ -24,9 +24,8 @@ Upload any PDF → Ask questions → Get accurate, grounded answers
 ## 🎯 Key Features
 
 ✅ **No Hallucinations** - Answers only from document content  
-✅ **Intelligent Retrieval** - MMR algorithm for diverse, relevant results  
+✅ **Intelligent Retrieval** - MMR algorithm for diverse, relevant results or Multi-Query method
 ✅ **Fast Processing** - Efficient PDF chunking and embedding  
-✅ **Multi-Query Support** - Alternative retrieval method available  
 ✅ **Session Management** - Auto-cleanup between different PDFs  
 ✅ **Interactive UI** - Streamlit interface with sidebar controls  
 ✅ **Local LLM** - Runs entirely on Ollama (privacy-first)  
@@ -53,9 +52,9 @@ Vector Embeddings
 ```
 User Question
     ↓
-Find Similar Context (MMR)
+Find Similar Context (MMR or Multi-Query)
     ↓
-Return Top 12 Diverse Chunks
+Return Top Results
 ```
 
 **Stage 3: Grounded Answer**
@@ -67,7 +66,7 @@ LLaMA 3.2 (temperature=0)
 Grounded Answer (no hallucinations)
 ```
 
-### Why MMR Instead of Similarity?
+### Why MMR and Multi Query Instead of Similarity?
 
 **Basic Approach:** Pure semantic similarity  
 → Returns redundant chunks from same document section
@@ -75,49 +74,7 @@ Grounded Answer (no hallucinations)
 **MMR Approach:** Maximal Marginal Relevance  
 → Balances relevance + diversity for comprehensive context (fetches 60, selects top 12)
 
----
-
-## 📦 Installation
-
-### Requirements
-- Python 3.10+
-- Ollama installed and running
-- 8GB RAM minimum
-
-### Setup
-
-**1. Install Ollama**
-```bash
-# Download from https://ollama.ai
-# Pull required models:
-ollama pull llama3.2
-ollama pull nomic-embed-text
-```
-
-**2. Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 🚀 Getting Started
-
-**Start the application**
-```bash
-streamlit run app.py
-```
-
-App opens at: `http://localhost:8501`
-
-**Usage:**
-1. Upload a PDF file
-2. Wait for processing (chunking + embedding)
-3. Ask questions in the chat interface
-4. Switch retrieval methods in sidebar (MMR/Multi-Query)
-
-**That's it!** The system automatically cleans up when you upload a new PDF.
-
+**Multi-Query Method:**  Generates multiple queries from the question to retrieve a wider range of relevant chunks, further enhancing answer quality.
 ---
 
 ## 📚 Project Structure
@@ -136,15 +93,3 @@ RAG-Document-Chat/
 └── README.md                  # This file
 ```
 
----
-
-## 🙏 Acknowledgments
-
-- **LLM:** [Ollama](https://ollama.ai/) - Local LLM runtime
-- **Embeddings:** [Nomic Embed Text](https://ollama.ai/library/nomic-embed-text)
-- **Vector DB:** [ChromaDB](https://www.trychroma.com/)
-- **Framework:** [LangChain](https://www.langchain.com/)
-- **UI:** [Streamlit](https://streamlit.io/)
-- **Inspiration:** [EpsteinFiles-RAG](https://github.com/AnkitNayak-eth/EpsteinFiles-RAG) - MMR retrieval & anti-hallucination patterns
-
----
