@@ -25,7 +25,7 @@ def main():
     
     retrieval_method = st.sidebar.selectbox(
         "Retrieval Method",
-        ["mmr", "multi_query"],
+        ["mmr", "multi_query", "rag_fusion"],
         index=0,
         help="Choose the retrieval strategy"
     )
@@ -38,6 +38,15 @@ def main():
             "✅ Prevents redundant results\n\n"
             "✅ Faster (single query)\n\n"
             "✅ More consistent"
+        )
+    elif retrieval_method == "rag_fusion":
+        st.sidebar.info(
+            "**RAG-Fusion (RRF Re-ranking)**\n\n"
+            "✅ Generates 4 related queries\n\n"
+            "✅ Consensus-based ranking\n\n"
+            "✅ High precision results\n\n"
+            "⚠️ Slower (multiple queries)\n\n"
+            "⚠️ Higher token usage"
         )
     else:
         st.sidebar.info(

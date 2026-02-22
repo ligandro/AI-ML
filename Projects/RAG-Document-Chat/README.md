@@ -24,7 +24,7 @@ Upload any PDF → Ask questions → Get accurate, grounded answers
 ## 🎯 Key Features
 
 ✅ **No Hallucinations** - Answers only from document content  
-✅ **Intelligent Retrieval** - MMR algorithm for diverse, relevant results or Multi-Query method
+✅ **Intelligent Retrieval** - MMR algorithm for diverse, relevant results or Multi-Query method, reranking results with RRF for consensus-based ranking
 ✅ **Fast Processing** - Efficient PDF chunking and embedding  
 ✅ **Session Management** - Auto-cleanup between different PDFs  
 ✅ **Interactive UI** - Streamlit interface with sidebar controls  
@@ -66,7 +66,7 @@ LLaMA 3.2 (temperature=0)
 Grounded Answer (no hallucinations)
 ```
 
-### Why MMR and Multi Query Instead of Similarity?
+### Why MMR, Multi Query or RAG-Fusion Instead of Similarity?
 
 **Basic Approach:** Pure semantic similarity  
 → Returns redundant chunks from same document section
@@ -75,8 +75,9 @@ Grounded Answer (no hallucinations)
 → Balances relevance + diversity for comprehensive context (fetches 60, selects top 12)
 
 **Multi-Query Method:**  Generates multiple queries from the question to retrieve a wider range of relevant chunks, further enhancing answer quality.
----
 
+**RAG-Fusion Method:** Upgrades Multi-Query approache by generating multiple queries, retrieving results for each, and then applying Reciprocal Rank Fusion (RRF) to rank results based on consensus across all queries. This method aims to provide the most relevant and diverse context for answering questions, especially in complex scenarios.
+---
 ## 📚 Project Structure
 
 ```
