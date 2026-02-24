@@ -1,6 +1,6 @@
 # 🤖 LLM Repository
 
-A comprehensive collection of AI/LLM topics and projects covering transformer training and retrieval-augmented generation (RAG).
+A comprehensive collection of AI/LLM topics and projects covering transformer training, retrieval-augmented generation (RAG), and practical AI applications.
 
 ---
 
@@ -10,20 +10,36 @@ A comprehensive collection of AI/LLM topics and projects covering transformer tr
 
 Hands-on implementations and tutorials for various LLM techniques:
 
-#### 1. **PreTraining**
-- Pre-training transformer models from scratch
-- Custom training loop implementation
-- Model checkpointing and evaluation
-- 📁 Location: `Topics/PreTraining/`
+#### 1. **RAG-Course CodeCamp**
+- Retrieval-Augmented Generation course
 
-#### 2. **RAG-Document-Chat**
-- Retrieval-Augmented Generation system
-- PDF document Q&A with local LLM (Ollama)
-- MMR retrieval & anti-hallucination features
-- Interactive Streamlit UI
-- 📁 Location: `Topics/RAG-Document-Chat/`
+---
 
--
+### 🚀 Projects
+
+Production-ready applications demonstrating practical AI implementations:
+
+#### 1. **AI-Flashcard**
+- Smart flashcard generator from YouTube videos and web articles
+- Automatic transcript extraction and content processing
+- AI-powered question/answer generation using Mistral 7B (Ollama)
+- Interactive web UI with flip animations
+- Flask backend with RESTful API
+- 📁 Location: `Projects/AI-Flashcard/`
+
+#### 2. **PreTraining**
+- Full transformer pre-training from scratch
+- Complete training pipeline implementation
+- 📁 Location: `Projects/PreTraining/`
+
+#### 3. **RAG-Document-Chat**
+- Document-based RAG system
+- Multiple retrieval methods (Basic, MMR, Re Ranking)
+- ChromaDB vector storage
+- 📁 Location: `Projects/RAG-Document-Chat/`
+
+---
+
 ## 📝 Notes
 
 - Each topic is self-contained with its own dependencies

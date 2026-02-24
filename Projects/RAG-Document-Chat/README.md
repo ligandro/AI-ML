@@ -77,6 +77,7 @@ Grounded Answer (no hallucinations)
 **Multi-Query Method:**  Generates multiple queries from the question to retrieve a wider range of relevant chunks, further enhancing answer quality.
 
 **RAG-Fusion Method:** Upgrades Multi-Query approache by generating multiple queries, retrieving results for each, and then applying Reciprocal Rank Fusion (RRF) to rank results based on consensus across all queries. This method aims to provide the most relevant and diverse context for answering questions, especially in complex scenarios.
+
 ---
 ## 📚 Project Structure
 
