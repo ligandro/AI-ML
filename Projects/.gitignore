@@ -32,6 +32,7 @@ Thumbs.db
 Finetuning/
 InstructionTuning/
 EpsteinFiles-RAG-main/
+LLM-Research-Agent-main/
 
 data/
 chroma_db/
