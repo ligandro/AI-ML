@@ -35,6 +35,8 @@ EpsteinFiles-RAG-main/
 LLM-Research-Agent-main/
 Research-Helper/
 mini_rag_agent/
+csv_rag/
+
 
 data/
 chroma_db/
