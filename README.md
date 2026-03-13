@@ -1,6 +1,6 @@
 # 🤖 LLM Repository
 
-A comprehensive collection of AI/LLM topics and projects covering transformer training, retrieval-augmented generation (RAG), and practical AI applications.
+A comprehensive collection of AI - LLM, Agents, Machine Learning, Deep Learning topics and projects covering transformer training, retrieval-augmented generation (RAG), and practical AI applications and many more.
 
 ---
 
