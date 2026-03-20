@@ -26,10 +26,6 @@ Understand how LLMs behave and how to reliably control outputs for real applicat
 - Create a small benchmark set (30–50 prompts).
 - Measure response quality using repeatable scoring.
 
-### Week 4 (optional)
-- Compare models/providers on cost, latency, and output quality.
-- Build prompt/version tracking in a simple spreadsheet or script.
-
 ## Hands-On Projects
 1. **Prompt Lab**
    - Same task, 10 prompt variants.
