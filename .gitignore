@@ -36,3 +36,5 @@ chroma_db/
 .streamlit/
 
 EpsteinFiles-RAG-main/
+
+Topics/Finetuning LLMs/

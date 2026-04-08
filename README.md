@@ -29,6 +29,13 @@ Hands-on implementations and tutorials for various LLM techniques:
 #### **6.Vector_Databases**
 - Chroma DB Tutorial
 
+#### **7.Pytorch**
+- Pytorch course by Daneil Bourke
+
+#### **8.AI-Engineer-Path**
+- Self path for AI engineering
+
+
 ---
 
 ### 🚀 Projects
@@ -46,7 +53,7 @@ Hands-on implementations and tutorials for various LLM techniques:
 - ChromaDB persistent storage and querying
 - Complete Jupyter notebook tutorial
 
-#### 3. **PreTraining**
+#### 3. **PreTraining Transformer from Scratch**
 - Full transformer pre-training from scratch
 - Complete training pipeline implementation
 
@@ -54,6 +61,10 @@ Hands-on implementations and tutorials for various LLM techniques:
 - Document-based RAG system
 - Multiple retrieval methods (Basic, MMR, Re Ranking)
 - ChromaDB vector storage
+
+#### 5. **AI-Job-Matcher**  
+- AI-powered job matching system
+- Resume parsing and job description analysis with cover letter generation
 
 ---
 
