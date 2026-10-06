@@ -1,28 +1,14 @@
-"""
-Configuration constants for RAG Document Chat
-Can be imported by both main app and ingest modules
-"""
+﻿"""Small, explicit limits for the local document chat app."""
 
-MODEL_NAME = "llama3.2"
-
-EMBEDDING_MODEL = "nomic-embed-text"
-
-VECTOR_STORE_NAME = "simple-rag"
-PERSIST_DIRECTORY = "chroma_db"
-
-CHUNK_SIZE = 1200
-CHUNK_OVERLAP = 300
-
-# Retrieval Configuration
-RETRIEVAL_TYPE = "mmr"  # Options: "mmr", "multi_query", or "rag_fusion"
-MMR_K = 12  # Number of documents to return
-MMR_FETCH_K = 60  # Number of documents to fetch before MMR filtering
-MMR_LAMBDA = 0.5  # Diversity factor (0 = max diversity, 1 = max relevance)
-
-# RAG-Fusion Configuration
-RRF_K = 60  # Constant for RRF formula (smoothing factor)
-FUSION_QUERIES = 4  # Number of related queries to generate
-
-# LLM Configuration (Anti-Hallucination Settings)
-LLM_TEMPERATURE = 0  # Deterministic responses (0 = no creativity, 1 = creative)
-LLM_MAX_TOKENS = 500  # Maximum response length
+CHAT_MODEL = "llama3.2"
+EMBED_MODEL = "nomic-embed-text"
+MAX_FILES = 5
+MAX_FILE_BYTES = 10 * 1024 * 1024
+MAX_PAGES_PER_FILE = 150
+MAX_QUESTION_CHARS = 1000
+CHUNK_CHARS = 1400
+CHUNK_OVERLAP = 200
+EMBED_BATCH_SIZE = 32
+TOP_K = 6
+SEARCH_CANDIDATES = 18
+MIN_COSINE_SIMILARITY = 0.25

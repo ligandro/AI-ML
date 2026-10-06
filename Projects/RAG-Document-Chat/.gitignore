@@ -1,35 +1,33 @@
-# Model checkpoint files
-Projects/Pre-Training_Transformer/models/checkpoints/*.pt
-
-# Large model files
-*.pt
-
-# Python cache
+# Python-generated files
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
+.pytest_cache/
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# Virtual environments
+# Virtual environments and IDE state
+.venv/
 venv/
 env/
 ENV/
-
-# IDE settings
 .vscode/
 .idea/
 *.swp
 *.swo
 
+# Local PDFs and ephemeral vector database
+data/
+chroma_db/
+
+# Legacy implementation and obsolete files; retained locally for reference
+ingest/
+rag/
+RAG-Document-Chat_OLD/
+RETRIEVAL_METHODS.md
+test.ipynb
+demo.png
+
 # OS files
 .DS_Store
 Thumbs.db
 
-
-data/
-chroma_db/
-.streamlit/
-RETRIEVAL_METHODS.md
+EXPLAINER.md

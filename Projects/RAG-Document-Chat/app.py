@@ -1,133 +1,123 @@
-import streamlit as st
+﻿"""Streamlit interface for local, evidence-first PDF chat."""
+
+from __future__ import annotations
+
+import hashlib
 import logging
-from langchain_ollama import ChatOllama
 
-# Import configuration
-from config import MODEL_NAME, LLM_TEMPERATURE, LLM_MAX_TOKENS
+import streamlit as st
 
-# Import ingest functions
-from ingest.load_pdf import ingest_pdf
-from ingest.embed_chunks import load_vector_db
+from config import MAX_FILES, MAX_QUESTION_CHARS
+from document_chat import RagIndex, extract_pdfs
 
-# Import RAG functions
-from rag.retriever import create_retriever
-from rag.chain import create_chain
-
-# Configure logging
 logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
+st.set_page_config(page_title="Document Chat", page_icon="📄", layout="wide")
+st.title("Document Chat")
+st.caption("Ask questions across your PDFs. Answers show the passages retrieved from the documents.")
+if "upload_generation" not in st.session_state:
+    st.session_state.upload_generation = 0
 
-def main():
-    st.title("📄 RAG Document Assistant 🤖")
-    
-    # Sidebar for configuration
-    st.sidebar.header("⚙️ Configuration")
-    
-    retrieval_method = st.sidebar.selectbox(
-        "Retrieval Method",
-        ["mmr", "multi_query", "rag_fusion"],
-        index=0,
-        help="Choose the retrieval strategy"
+with st.sidebar:
+    st.header("Documents")
+    files = st.file_uploader(
+        "Add up to five PDFs", type="pdf", accept_multiple_files=True,
+        key=f"files_{st.session_state.upload_generation}",
     )
-    
-    # Display info about selected method
-    if retrieval_method == "mmr":
-        st.sidebar.info(
-            "**MMR (Maximal Marginal Relevance)**\n\n"
-            "✅ Balances relevance + diversity\n\n"
-            "✅ Prevents redundant results\n\n"
-            "✅ Faster (single query)\n\n"
-            "✅ More consistent"
-        )
-    elif retrieval_method == "rag_fusion":
-        st.sidebar.info(
-            "**RAG-Fusion (RRF Re-ranking)**\n\n"
-            "✅ Generates 4 related queries\n\n"
-            "✅ Consensus-based ranking\n\n"
-            "✅ High precision results\n\n"
-            "⚠️ Slower (multiple queries)\n\n"
-            "⚠️ Higher token usage"
-        )
-    else:
-        st.sidebar.info(
-            "**Multi-Query Retriever**\n\n"
-            "✅ Generates 5 query variations\n\n"
-            "✅ Comprehensive coverage\n\n"
-            "⚠️ Slower (multiple queries)\n\n"
-            "⚠️ Higher token usage"
-        )
+    method = st.selectbox("Search method", ["hybrid", "semantic", "keyword"],
+                          help="Hybrid combines semantic and keyword search.")
+    if st.button("Clear conversation and documents"):
+        previous = st.session_state.get("index")
+        if previous is not None:
+            previous.close()
+        for key in ("index", "file_signature", "messages", "warnings"):
+            st.session_state.pop(key, None)
+        st.session_state.upload_generation += 1
+        st.rerun()
+    st.caption("Runs through your local Ollama server. PDFs are held in this app session, not saved by this project.")
 
-    # File uploader
-    uploaded_file = st.file_uploader("Upload a PDF file", type=["pdf"])
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    if uploaded_file is not None:
-        # Initialize session state for caching
-        if "vector_db" not in st.session_state or st.session_state.get("file_name") != uploaded_file.name:
-            # Clear all session state to release database connections
-            if st.session_state.get("file_name") != uploaded_file.name and st.session_state.get("file_name") is not None:
-                logging.info(f"🔄 New file detected. Clearing session state...")
-                st.session_state.clear()
-                
-                # Give time for resources to be released
-                import time
-                import gc
-                gc.collect()
-                time.sleep(0.3)
-            
-            with st.spinner("Processing PDF (clearing previous data)..."):
-                documents, file_path = ingest_pdf(uploaded_file, clear_existing=True)
-                if documents is None:
-                    return
-
-                vector_db = load_vector_db(documents, clear_existing=True)
-                
-                # Store in session state
-                st.session_state.vector_db = vector_db
-                st.session_state.file_name = uploaded_file.name
-                
-                logging.info(f"✅ New PDF '{uploaded_file.name}' processed successfully")
-        
-        # Get vector_db from session state
-        vector_db = st.session_state.vector_db
-        
-        # Create retriever and chain (recreate if method changed)
-        if ("retrieval_method" not in st.session_state or 
-            st.session_state.retrieval_method != retrieval_method):
-            
-            with st.spinner(f"Setting up {retrieval_method.upper()} retriever..."):
-                llm = ChatOllama(
-                    model=MODEL_NAME, 
-                    temperature=LLM_TEMPERATURE, 
-                    num_predict=LLM_MAX_TOKENS
-                )
-                retriever = create_retriever(vector_db, llm, retrieval_type=retrieval_method)
-                chain = create_chain(retriever, llm)
-                
-                # Store in session state
-                st.session_state.retriever = retriever
-                st.session_state.chain = chain
-                st.session_state.retrieval_method = retrieval_method
-        
-        # Get chain from session state
-        chain = st.session_state.chain
-
-        st.success(f"✅ **{uploaded_file.name}** processed! Using **{retrieval_method.upper()}** retrieval.")
-        st.info("💡 Upload a new PDF to automatically clear previous data.")
-
-        # User input
-        user_input = st.text_input("Enter your question:")
-
-        if user_input:
-            with st.spinner("Generating response..."):
+if files:
+    if len(files) > MAX_FILES:
+        st.error(f"Please select no more than {MAX_FILES} PDFs.")
+        st.stop()
+    # Hash content as well as names so replacing a PDF with the same filename reindexes it.
+    payload = [(file.name, file.getvalue()) for file in files]
+    signature = hashlib.sha256(
+        b"".join(name.encode() + b"\0" + hashlib.sha256(data).digest() for name, data in payload)
+    ).hexdigest()
+    if st.session_state.get("file_signature") != signature:
+        with st.spinner("Reading pages and building the search index…"):
+            try:
+                chunks, warnings = extract_pdfs(payload)
+                index = RagIndex.build(chunks)
+            except ValueError as exc:
+                st.error(str(exc))
+                st.stop()
+            except Exception:
+                log.exception("Document indexing failed")
+                st.error("Indexing failed. Check that Ollama is running and the embedding model is installed.")
+                st.stop()
+            previous = st.session_state.get("index")
+            if previous is not None:
                 try:
-                    response = chain.invoke(input=user_input)
-                    st.markdown("**Assistant:**")
-                    st.write(response)
-                except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
-    else:
-        st.info("Please upload a PDF file to begin.")
+                    previous.close()
+                except Exception:
+                    log.warning("Could not release prior in-memory collection", exc_info=True)
+            st.session_state.index = index
+            st.session_state.file_signature = signature
+            st.session_state.messages = []
+            st.session_state.warnings = warnings
+    st.success(f"Indexed {len(st.session_state.index.chunks)} passages from {len(files)} PDF(s).")
+    for warning in st.session_state.get("warnings", []):
+        st.warning(warning)
+else:
+    # Do not allow questions against PDFs that are no longer in the uploader.
+    previous = st.session_state.get("index")
+    if previous is not None:
+        previous.close()
+    st.session_state.pop("index", None)
+    st.session_state.pop("file_signature", None)
+    st.info("Upload a PDF to begin. Text-based PDFs work best; scanned pages require OCR.")
 
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        if message.get("sources"):
+            with st.expander("Context sent to the model"):
+                for source in message["sources"]:
+                    st.markdown(f"**[{source['number']}] {source['name']} · page {source['page']}**")
+                    st.text(source["excerpt"])
 
-if __name__ == "__main__":
-    main()
+question = st.chat_input("Ask about your documents", disabled="index" not in st.session_state,
+                         max_chars=MAX_QUESTION_CHARS)
+if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+    with st.chat_message("assistant"):
+        with st.spinner("Searching and answering…"):
+            try:
+                answer, hits = st.session_state.index.answer(question, method)
+                sources = [
+                    {"number": i, "name": hit.chunk.source, "page": hit.chunk.page,
+                     "excerpt": hit.chunk.text}
+                    for i, hit in enumerate(hits, 1)
+                ]
+                st.markdown(answer)
+                with st.expander("Context sent to the model"):
+                    for source in sources:
+                        st.markdown(f"**[{source['number']}] {source['name']} · page {source['page']}**")
+                        st.text(source["excerpt"])
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": answer, "sources": sources}
+                )
+            except ValueError as exc:
+                st.error(str(exc))
+            except Exception:
+                log.exception("Question answering failed")
+                st.error("Could not answer. Check that Ollama is running and the chat model is installed.")
+

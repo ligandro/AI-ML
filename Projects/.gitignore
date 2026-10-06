@@ -41,3 +41,5 @@ Finetuning_T5/
 data/
 chroma_db/
 .streamlit/
+
+RAG-Document-Chat_OLD/

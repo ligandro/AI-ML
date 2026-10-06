@@ -1,0 +1,5 @@
+streamlit>=1.55,<2
+pypdf>=5,<8
+chromadb>=1,<2
+ollama>=0.5,<1
+pydantic>=2,<3
